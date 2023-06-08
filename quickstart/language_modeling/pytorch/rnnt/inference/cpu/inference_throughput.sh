@@ -57,23 +57,18 @@ export DNNL_PRIMITIVE_CACHE_CAPACITY=1024
 export KMP_BLOCKTIME=1
 export KMP_AFFINITY=granularity=fine,compact,1,0
 
-BATCH_SIZE=448
+BATCH_SIZE=1
 PRECISION=$1
 
 rm -rf ${OUTPUT_DIR}/rnnt_${PRECISION}_inference_throughput*
 
-python -m intel_extension_for_pytorch.cpu.launch \
-    --use_default_allocator \
-    --throughput_mode \
-    --log_path ${OUTPUT_DIR} \
-    --log_file_prefix rnnt_${PRECISION}_inference_throughput \
+python \
     ${MODEL_DIR}/models/language_modeling/pytorch/rnnt/inference/cpu/inference.py \
     --dataset_dir ${DATASET_DIR}/dataset/LibriSpeech/ \
     --val_manifest ${DATASET_DIR}/dataset/LibriSpeech/librispeech-dev-clean-wav.json \
     --model_toml ${MODEL_DIR}/models/language_modeling/pytorch/rnnt/inference/cpu/configs/rnnt.toml \
     --ckpt ${CHECKPOINT_DIR}/results/rnnt.pt \
     --batch_size $BATCH_SIZE \
-    --ipex \
     --jit \
     --warm_up 3 \
     --sort_by_duration \

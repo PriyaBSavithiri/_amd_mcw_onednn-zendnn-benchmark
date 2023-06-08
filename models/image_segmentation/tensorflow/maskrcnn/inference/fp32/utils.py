@@ -436,7 +436,7 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
             scale = max_dim / image_max
     # Resize image and mask
     if scale != 1:
-        image = scipy.misc.imresize(
+        image = skimage.transform.resize(
             image, (round(h * scale), round(w * scale)))
     # Need padding?
     if padding:
@@ -747,3 +747,4 @@ def download_trained_weights(coco_model_path, verbose=1):
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")
+

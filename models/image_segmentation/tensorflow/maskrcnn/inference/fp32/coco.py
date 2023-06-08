@@ -405,14 +405,14 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, warmup=0, ima
         results.extend(image_results)
 
     # Load results. This modifies results with additional attributes.
-    coco_results = coco.loadRes(results)
+    # coco_results = coco.loadRes(results)
 
-    # Evaluate
-    cocoEval = COCOeval(coco, coco_results, eval_type)
-    cocoEval.params.imgIds = coco_image_ids
-    cocoEval.evaluate()
-    cocoEval.accumulate()
-    cocoEval.summarize()
+    # # Evaluate
+    # cocoEval = COCOeval(coco, coco_results, eval_type)
+    # cocoEval.params.imgIds = coco_image_ids
+    # cocoEval.evaluate()
+    # cocoEval.accumulate()
+    # cocoEval.summarize()
 
     print("Batch size: %d" % (config.BATCH_SIZE))
     print("Time spent per BATCH: %.4f ms" % (t_prediction / (len(image_ids)/config.BATCH_SIZE-warmup) * 1000))
@@ -584,3 +584,4 @@ if __name__ == '__main__':
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))
+

@@ -52,7 +52,7 @@ fi
 
 export MALLOC_CONF="oversize_threshold:1,background_thread:true,metadata_thp:auto,dirty_decay_ms:9000000000,muzzy_decay_ms:9000000000";
 INT8_CONFIG=${INT8_CONFIG:-"configure.json"}
-BATCH_SIZE=${BATCH_SIZE:-56}
+BATCH_SIZE=1
 EVAL_DATA_FILE=${EVAL_DATA_FILE:-"${PWD}/squad1.1/dev-v1.1.json"}
 FINETUNED_MODEL=${FINETUNED_MODEL:-"bert_squad_model"}
 OUTPUT_DIR=${OUTPUT_DIR:-${PWD}}
@@ -62,8 +62,8 @@ work_space=${work_space:-${OUTPUT_DIR}}
 rm -rf ${OUTPUT_DIR}/throughput_log*
 
 if [ ${WEIGHT_SHAREING} ]; then
-  CORES=`lscpu | grep Core | awk '{print $4}'`
-  SOCKETS=`lscpu | grep Socket | awk '{print $2}'`
+  CORES=`lscpu | grep 'Core(s)' | awk '{print $4}'`
+  SOCKETS=`lscpu | grep 'Socket(s)' | awk '{print $2}'`
   TOTAL_CORES=`expr $CORES \* $SOCKETS`
   CORES_PER_INSTANCE=$CORES
   INSTANCES=`expr $TOTAL_CORES / $CORES_PER_INSTANCE`
@@ -73,7 +73,7 @@ if [ ${WEIGHT_SHAREING} ]; then
   echo "Running Bert_Large inference throughput with runtime extension enabled."
   STREAM_PER_INSTANCE=$CORES_PER_INSTANCE
   #export OMP_NUM_THREADS=`expr $BATCH_SIZE \/ $STREAM_PER_INSTANCE`
-  BATCH_SIZE=$STREAM_PER_INSTANCE
+  BATCH_SIZE=1
   for i in $(seq 0 $LAST_INSTANCE); do
     numa_node_i=`expr $i / $INSTANCES_PER_SOCKET`
     start_core_i=`expr $i \* $CORES_PER_INSTANCE`
@@ -89,7 +89,7 @@ if [ ${WEIGHT_SHAREING} ]; then
   done
   wait
 else
-  python -m intel_extension_for_pytorch.cpu.launch --throughput_mode --enable_jemalloc --log_path=${OUTPUT_DIR} --log_file_prefix="./throughput_log_${precision}" ${EVAL_SCRIPT} $ARGS --model_type bert --model_name_or_path ${FINETUNED_MODEL} --tokenizer_name bert-large-uncased-whole-word-masking-finetuned-squad  --do_eval --do_lower_case --predict_file $EVAL_DATA_FILE --per_gpu_eval_batch_size $BATCH_SIZE --learning_rate 3e-5 --num_train_epochs 2.0 --max_seq_length 384 --doc_stride 128 --output_dir ./tmp --perf_begin_iter 15 --use_jit --perf_run_iters 40 --int8_config ${INT8_CONFIG}
+  python ${EVAL_SCRIPT} $ARGS --model_type bert --model_name_or_path ${FINETUNED_MODEL} --tokenizer_name bert-large-uncased-whole-word-masking-finetuned-squad  --do_eval --do_lower_case --predict_file $EVAL_DATA_FILE --per_gpu_eval_batch_size $BATCH_SIZE --learning_rate 3e-5 --num_train_epochs 2.0 --max_seq_length 384 --doc_stride 128 --output_dir ./tmp --perf_begin_iter 15 --use_jit --perf_run_iters 40 --int8_config ${INT8_CONFIG}
 fi
 
 throughput=$(grep 'Throughput:' ${OUTPUT_DIR}/throughput_log* |sed -e 's/.*Throughput//;s/[^0-9.]//g' |awk '

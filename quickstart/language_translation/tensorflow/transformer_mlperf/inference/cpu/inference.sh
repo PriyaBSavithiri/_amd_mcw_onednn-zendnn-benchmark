@@ -85,9 +85,9 @@ _command python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
   --output-dir ${OUTPUT_DIR} \
   --batch-size ${BATCH_SIZE} \
   $@ \
-  -- params=big file=uniformed_input_28tokens.en \
+  -- params=big file=newstest2014.en \
   file_out=translate_benchmark.txt \
-  reference=uniformed_input_28tokens.de \
+  reference=newstest2014.de \
   vocab_file=vocab.ende.32768 \
   warmup_steps=3 steps=91
 

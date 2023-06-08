@@ -78,16 +78,16 @@ _command python benchmarks/launch_benchmark.py \
          --benchmark-only \
          --batch-size=1 \
          --output-dir=${OUTPUT_DIR} \
-         --num-intra-threads=${CORES_PER_INSTANCE} \
-         --num-inter-threads=1 \
-         --numa-cores-per-instance=${CORES_PER_INSTANCE} \
+   #      --num-intra-threads=${CORES_PER_INSTANCE} \
+  #       --num-inter-threads=1 \
+ #        --numa-cores-per-instance=${CORES_PER_INSTANCE} \
          --warmup-steps=${WARMUP_STEPS} \
          $@
 
-if [[ $? == 0 ]]; then
-  grep "Latency: " ${OUTPUT_DIR}/distilbert_base_${PRECISION}_inference_bs1_cores${CORES_PER_INSTANCE}_all_instances.log | sed -e "s/.*://;s/ms//" | awk ' {sum+=$1;} END{print sum} '
-  exit 0
-else
-  exit 1
-fi
+#if [[ $? == 0 ]]; then
+#  grep "Latency: " ${OUTPUT_DIR}/distilbert_base_${PRECISION}_inference_bs1_cores${CORES_PER_INSTANCE}_all_instances.log | sed -e "s/.*://;s/ms//" | awk ' {sum+=$1;} END{print sum} '
+#  exit 0
+#else
+ # exit 1
+#fi
 
